@@ -20,6 +20,7 @@ app.get('/logs/regex', handlers.findByRegex);
 app.get('/logs/search', handlers.search);
 app.get('/logs/aggregation', handlers.findByAggregation);
 
+app.get('/logs/charts/level/percent', handlers.getChartLevelPercent);
 
 app.listen(port, () => {
   console.log(`Server is Fire at http://localhost:${port}`);

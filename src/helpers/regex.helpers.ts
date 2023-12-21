@@ -21,8 +21,6 @@ const convertStringToRegex = (string: string) => {
 
   const regex = new RegExp(pattern, flags);
 
-  console.log(regex);
-
   return regex;
 }
 

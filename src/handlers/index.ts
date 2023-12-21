@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 
 import { logService } from "../db";
 import { regexHelpers, textHelpers } from "../helpers";
+import { chartUtils } from '../utils';
 
 const createLog = async (req: Request, res: Response) => {
   const log = textHelpers.parseText(req.body);
@@ -68,6 +69,34 @@ const findByAggregation = async (req: Request, res: Response) => {
   }
 }
 
+const getChartLevelPercent = async (req: Request, res: Response) => {
+  try {
+    const result = await logService.aggregate([
+      {
+        $group: {
+          _id: "$level",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const labels = result.map((entry) => entry._id);
+    const data = result.map((entry) => entry.count);
+
+    const pieChartBuffer = chartUtils.createPieChart(labels, data);
+
+    res.writeHead(200, {
+      'Content-Type': 'image/png',
+      'Content-Length': pieChartBuffer.length,
+    });
+
+    res.end(pieChartBuffer);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
 export default {
   createLog,
 
@@ -75,4 +104,6 @@ export default {
   findByRegex,
   search,
   findByAggregation,
+
+  getChartLevelPercent,
 }
