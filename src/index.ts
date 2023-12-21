@@ -1,7 +1,9 @@
 import express, { Request, Response, Application } from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+
 import { textHelpers } from './helpers';
+import { logService } from './db';
 
 dotenv.config();
 
@@ -10,8 +12,11 @@ const port = process.env.PORT || 8000;
 
 app.use(bodyParser.text());
 
-app.post('/logs', (req: Request, res: Response) => {
+app.post('/logs', async (req: Request, res: Response) => {
   const log = textHelpers.parseText(req.body);
+
+  await logService.create(log);
+
   res.send(log);
 })
 
