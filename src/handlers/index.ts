@@ -51,10 +51,28 @@ const search = async (req: Request, res: Response) => {
   res.status(200).send(logs);
 }
 
+const findByAggregation = async (req: Request, res: Response) => {
+  try {
+    const pipeline = req.body.pipeline;
+
+    if (!pipeline || !Array.isArray(pipeline)) {
+      return res.status(400).json({ error: 'Invalid pipeline format' });
+    }
+
+    const result = await logService.aggregate(pipeline);
+
+    res.status(200).json({ result });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
 export default {
   createLog,
 
   getAll,
   findByRegex,
   search,
+  findByAggregation,
 }

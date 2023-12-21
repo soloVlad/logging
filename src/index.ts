@@ -10,6 +10,7 @@ const app: Application = express();
 const port = process.env.PORT || 8000;
 
 app.use(bodyParser.text());
+app.use(bodyParser.json());
 
 
 app.post('/logs', handlers.createLog);
@@ -17,6 +18,7 @@ app.post('/logs', handlers.createLog);
 app.get('/logs', handlers.getAll);
 app.get('/logs/regex', handlers.findByRegex);
 app.get('/logs/search', handlers.search);
+app.get('/logs/aggregation', handlers.findByAggregation);
 
 
 app.listen(port, () => {
