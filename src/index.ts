@@ -20,6 +20,12 @@ app.post('/logs', async (req: Request, res: Response) => {
   res.send(log);
 })
 
+app.get('/logs', async (req: Request, res: Response) => {
+  const logs = await logService.find();
+
+  res.send(logs);
+})
+
 app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to Express & TypeScript Server');
 });
