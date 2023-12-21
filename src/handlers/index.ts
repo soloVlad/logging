@@ -27,7 +27,25 @@ const findByRegex = async (req: Request, res: Response) => {
   }
 
   const logs = await logService.find({
-    message: { $regex: regex },
+    $or: [
+      { message: { $regex: regex } },
+      { level: { $regex: regex } },
+    ]
+  });
+
+  res.status(200).send(logs);
+}
+
+const search = async (req: Request, res: Response) => {
+  const searchValue = req.body;
+  const validatedSearch = searchValue?.split('\\').join('\\\\').split('.').join('\\.') ?? '';
+  const regex = new RegExp(validatedSearch, 'gi');
+
+  const logs = await logService.find({
+    $or: [
+      { message: { $regex: regex } },
+      { level: { $regex: regex } },
+    ]
   });
 
   res.status(200).send(logs);
@@ -38,4 +56,5 @@ export default {
 
   getAll,
   findByRegex,
+  search,
 }
