@@ -2,8 +2,8 @@ import express, { Request, Response, Application } from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 
-import { textHelpers } from './helpers';
 import { logService } from './db';
+import handlers from './handlers';
 
 dotenv.config();
 
@@ -12,23 +12,12 @@ const port = process.env.PORT || 8000;
 
 app.use(bodyParser.text());
 
-app.post('/logs', async (req: Request, res: Response) => {
-  const log = textHelpers.parseText(req.body);
 
-  await logService.create(log);
+app.post('/logs', handlers.createLog);
 
-  res.send(log);
-})
+app.get('/logs', handlers.getAll)
+app.get('/logs/regex', handlers.findByRegex)
 
-app.get('/logs', async (req: Request, res: Response) => {
-  const logs = await logService.find();
-
-  res.send(logs);
-})
-
-app.get('/', (req: Request, res: Response) => {
-  res.send('Welcome to Express & TypeScript Server');
-});
 
 app.listen(port, () => {
   console.log(`Server is Fire at http://localhost:${port}`);
