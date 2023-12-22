@@ -133,6 +133,34 @@ const getChartLevelPercent = async (req: Request, res: Response) => {
   }
 }
 
+const getChartLevelAmount = async (req: Request, res: Response) => {
+  try {
+    const result = await logService.aggregate([
+      {
+        $group: {
+          _id: "$level",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const labels = result.map((entry) => entry._id);
+    const data = result.map((entry) => entry.count);
+
+    const columnChartBuffer = chartUtils.createColumnChart(labels, data);
+
+    res.writeHead(200, {
+      'Content-Type': 'image/png',
+      'Content-Length': columnChartBuffer.length,
+    });
+
+    res.end(columnChartBuffer);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
 export default {
   createLog,
   createLogByFile,
@@ -143,4 +171,5 @@ export default {
   findByAggregation,
 
   getChartLevelPercent,
+  getChartLevelAmount,
 }

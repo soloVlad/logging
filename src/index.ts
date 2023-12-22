@@ -26,6 +26,7 @@ app.get('/logs/search', handlers.search);
 app.get('/logs/aggregation', handlers.findByAggregation);
 
 app.get('/logs/charts/level/percent', handlers.getChartLevelPercent);
+app.get('/logs/charts/level/amount', handlers.getChartLevelAmount);
 
 app.listen(port, () => {
   console.log(`Server is Fire at http://localhost:${port}`);
