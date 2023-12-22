@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
-import * as fastXmlParser from 'fast-xml-parser';
+import { XMLParser } from 'fast-xml-parser';
 
 import { logService } from "../db";
 import { regexHelpers, textHelpers } from "../helpers";
 import { chartUtils } from '../utils';
 
+const xmlParser = new XMLParser();
 
 const createLog = async (req: Request, res: Response) => {
   const log = textHelpers.parseText(req.body);
@@ -27,16 +28,15 @@ const createLogByFile = async (req: Request, res: Response) => {
     if (fileType === 'application/json') {
       const jsonContent = JSON.parse(fileBuffer.toString());
 
-      console.log('JSON Content:', jsonContent);
+      await logService.create(jsonContent);
 
       return res.status(200).send('File uploaded and processed successfully');
     }
 
     if (fileType === 'application/xml' || fileType === 'text/xml') {
-      //@ts-ignore-next-line
-      const xmlContent = fastXmlParser.parse(fileBuffer.toString());
+      const xmlContent = xmlParser.parse(fileBuffer.toString());
 
-      console.log('XML Content:', xmlContent);
+      await logService.create(xmlContent.log);
 
       return res.status(200).send('File uploaded and processed successfully');
     }
