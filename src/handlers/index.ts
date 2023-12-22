@@ -3,7 +3,7 @@ import { XMLParser } from 'fast-xml-parser';
 
 import { logService } from "../db";
 import { regexHelpers, textHelpers } from "../helpers";
-import { chartUtils } from '../utils';
+import { chartUtils, dateUtils } from '../utils';
 
 const xmlParser = new XMLParser();
 
@@ -161,6 +161,34 @@ const getChartLevelAmount = async (req: Request, res: Response) => {
   }
 }
 
+const getChartDateAmount = async (req: Request, res: Response) => {
+  try {
+    const result = await logService.aggregate([
+      {
+        $group: {
+          _id: "$date",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const labels = result.map((entry) => dateUtils.formatDate(entry._id));
+    const data = result.map((entry) => entry.count);
+
+    const columnChartBuffer = chartUtils.createColumnChart(labels, data);
+
+    res.writeHead(200, {
+      'Content-Type': 'image/png',
+      'Content-Length': columnChartBuffer.length,
+    });
+
+    res.end(columnChartBuffer);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
 export default {
   createLog,
   createLogByFile,
@@ -172,4 +200,5 @@ export default {
 
   getChartLevelPercent,
   getChartLevelAmount,
+  getChartDateAmount,
 }
