@@ -1,0 +1,9 @@
+{
+  "level": "info",
+  "date": "2023-12-21T15:30:00Z",
+  "message": "Log message",
+  "metadata": {
+    "receiver": "John Doe"
+  }
+}
+

@@ -1,0 +1,9 @@
+<log>
+  <level>info</level>
+  <date>2023-12-21T15:30:00Z</date>
+  <message>Log message</message>
+  <metadata>
+    <receiver>John Doe</receiver>
+  </metadata>
+</log>
+

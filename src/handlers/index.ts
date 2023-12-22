@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
+import * as fastXmlParser from 'fast-xml-parser';
 
 import { logService } from "../db";
 import { regexHelpers, textHelpers } from "../helpers";
 import { chartUtils } from '../utils';
+
 
 const createLog = async (req: Request, res: Response) => {
   const log = textHelpers.parseText(req.body);
@@ -10,6 +12,40 @@ const createLog = async (req: Request, res: Response) => {
   await logService.create(log);
 
   res.send(log);
+};
+
+const createLogByFile = async (req: Request, res: Response) => {
+  try {
+    const fileBuffer = req.file?.buffer;
+
+    if (!fileBuffer || !req.file) {
+      return res.status(400).send('No file uploaded');
+    }
+
+    const fileType = req.file.mimetype;
+
+    if (fileType === 'application/json') {
+      const jsonContent = JSON.parse(fileBuffer.toString());
+
+      console.log('JSON Content:', jsonContent);
+
+      return res.status(200).send('File uploaded and processed successfully');
+    }
+
+    if (fileType === 'application/xml' || fileType === 'text/xml') {
+      //@ts-ignore-next-line
+      const xmlContent = fastXmlParser.parse(fileBuffer.toString());
+
+      console.log('XML Content:', xmlContent);
+
+      return res.status(200).send('File uploaded and processed successfully');
+    }
+
+    return res.status(400).send('Unsupported file type');
+  } catch (error) {
+    console.error('Error:', error);
+    return res.status(500).send('Internal Server Error');
+  }
 };
 
 const getAll = async (req: Request, res: Response) => {
@@ -99,6 +135,7 @@ const getChartLevelPercent = async (req: Request, res: Response) => {
 
 export default {
   createLog,
+  createLogByFile,
 
   getAll,
   findByRegex,
